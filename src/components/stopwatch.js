@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Time from "./format_time";
+import Table from "./table_laps";
 
 class Stopwatch extends Component {
 	constructor(props) {
@@ -8,7 +9,8 @@ class Stopwatch extends Component {
 		this.state = {
 			status: "stopped",
 			start: null,
-			elapsed: 0
+			elapsed: 0,
+			laps: []
 		};
 
 		this.start = this.start.bind(this);
@@ -28,7 +30,8 @@ class Stopwatch extends Component {
 
 		this.setState({
 			status: "running",
-			start: newStart
+			start: newStart,
+			laps: []
 		});
 
 		setTimeout(this.update, 10);
@@ -41,33 +44,23 @@ class Stopwatch extends Component {
 	}
 
 	lap() {
-		const { status, elapsed } = this.state;
-		let lap = false;
-
-		if (status === "stopped") {
-			if (lap !== false) {
-				this.setState({
-					status = "stopped",
-					elapsed: new Date().getTime() - start
-				});
-			
-				let saveTime = this.state.elapsed;
-
-				createLapInfo(saveTime);
-				
+		const { status, start, elapsed, laps } = this.state;
+		if (status === "running") {
+			let lap = new Date().getTime();
+			let lapStart = null;
+			if (this.state.lapStart === undefined) {
+				lapStart = start;
+			} else {
+				lapStart = new Date().getTime();
 			}
-		}
-	}
+			lap = lap - lapStart;
+			laps.push(lap);
 
-	createLapInfo(time){
-		
-		const lapRow = time.data.map(function(item, index){
-			return (
-				<tr key={index}>
-					<td>{item.lap}</td>
-				</tr>
-			);
-		});
+			this.setState({
+				laps: laps,
+				lapStart: lapStart
+			});
+		}
 	}
 
 	update() {
@@ -86,12 +79,13 @@ class Stopwatch extends Component {
 		this.setState({
 			status: "stopped",
 			start: null,
-			elapsed: 0
+			elapsed: 0,
+			laps: []
 		});
 	}
 
 	render() {
-		const { elapsed, status } = this.state;
+		const { laps, elapsed, status } = this.state;
 
 		return (
 			<div className="jumbotron">
@@ -114,7 +108,7 @@ class Stopwatch extends Component {
 						Reset
 					</button>
 				</p>
-				<table>{this.lap}</table>
+				<Table data={laps} />
 			</div>
 		);
 	}
