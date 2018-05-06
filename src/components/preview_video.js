@@ -1,9 +1,10 @@
 import React from "react";
 import { Player } from "video-react";
+import "./styles.css";
 
 export default props => {
 	const { info } = props;
-	const moviePre = info["link"][1]["attributes"]["im:assetType"];
+	const moviePre = info["link"][1]["attributes"]["href"];
 
-	return <Player playsInline src={moviePre} />;
+	return <Player className="video" playsInline src={moviePre} />;
 };
